@@ -72,7 +72,7 @@ body {
   0%{transform:scale(1);}50%{transform:scale(1.3);color:#e8732a;}100%{transform:scale(1);}
 }
 
-.controls { display:flex; gap:8px; margin-bottom:12px; }
+.controls { display:flex; gap:8px; margin-bottom:12px; align-items:center; }
 .btn {
   flex:1; border:none; border-radius:var(--radius);
   padding:11px 0; font-family:'Kosugi Maru',sans-serif;
@@ -83,6 +83,7 @@ body {
 .btn-p { background:var(--btn); color:#fff; box-shadow:0 3px 10px rgba(232,115,42,.35); }
 .btn-g { background:#fff; color:var(--text); box-shadow:0 2px 6px rgba(0,0,0,.1); border:2px solid #f5c842; }
 .btn-g:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+.btn-sm { padding:7px 12px; font-size:0.78rem; flex:none; }
 
 .challenge { font-size:0.82rem; color:#b07030; margin-bottom:12px; text-align:center; }
 .challenge strong { color:var(--accent); }
@@ -198,7 +199,7 @@ body {
   </div>
 
   <div class="controls">
-    <button class="btn btn-p" onclick="newGame()">💩 新しいゲーム</button>
+    <button class="btn btn-p btn-sm" onclick="confirmNewGame()">💩 新しいゲーム</button>
     <button class="btn btn-g" id="undo-btn" onclick="undo()">↩ もどす</button>
   </div>
 
@@ -213,6 +214,14 @@ body {
     </div>
     <div class="tiles-layer" id="tiles"></div>
   </div>
+</div>
+
+<div class="overlay hidden" id="confirm-overlay">
+  <div class="big-emoji">💩</div>
+  <h2 style="font-size:1.6rem">ゲームをやめる？</h2>
+  <p>今のゲームが終わっちゃうよ！</p>
+  <button class="btn btn-p" style="flex:none;min-width:170px;padding:13px 0" onclick="doNewGame()">やめる！新しくする！</button>
+  <button class="btn btn-g" style="flex:none;min-width:170px;padding:13px 0" onclick="document.getElementById('confirm-overlay').classList.add('hidden')">やっぱりつづける</button>
 </div>
 
 <div class="overlay hidden" id="win-overlay">
@@ -355,6 +364,25 @@ let grid,score,hiScore,prevGrid,prevScore,won,continueAfterWin;
 function init(){
   hiScore=parseInt(localStorage.getItem('unko2048hi')||'0');
   updateHi(); newGame(); setupInput();
+}
+
+function isGameInProgress(){
+  const winHidden = document.getElementById('win-overlay').classList.contains('hidden');
+  const overHidden = document.getElementById('over-overlay').classList.contains('hidden');
+  return overHidden && winHidden && (score > 0 || prevGrid !== null);
+}
+
+function confirmNewGame(){
+  if(isGameInProgress()){
+    document.getElementById('confirm-overlay').classList.remove('hidden');
+  } else {
+    newGame();
+  }
+}
+
+function doNewGame(){
+  document.getElementById('confirm-overlay').classList.add('hidden');
+  newGame();
 }
 
 function newGame(){
